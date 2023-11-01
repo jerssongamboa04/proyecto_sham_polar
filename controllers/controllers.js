@@ -3,7 +3,7 @@
 // importacion de querys
 const { listUsers, listIncidence, getIncidenceByUserEmail, queryCreateIncidence, queryCreateUser,
     updateIncidencia, getAllUsersByEmail, queryDeleteIncidenceId, queryCreateIncidenceDaily, listIncidenceDaily, getAllIncidenceDailyByEmail
-    , getAnalystsByEmail, queryDeleteUserId, queryDeleteDailyId, queryUpdateUserId, querySearchIncidenciasUserId, querySearchDailyUserId } = require("../query");
+    , getAnalystsByEmail, queryDeleteUserId, queryDeleteDailyId, queryUpdateUserId, querySearchIncidenciasUserId, querySearchDailyUserId, queryUpdateImagesUserId } = require("../query");
 
 
 
@@ -319,9 +319,58 @@ const searchDailyUserId = async (req, res) => {
     
     }
 
+    
+// ============ UPDATE IMAGES USER for ID================
+
+const UpdateImagesUserId = async (req, res) => {
+    const client = await pool.connect();
+    const user_id = req.params.id;
+    const { images } = req.body;
+    const values = [images, user_id];
+
+    try {
+        const response = await client.query(queryUpdateImagesUserId, values);
+        res.status(200).json({ response: true, result: response.rows });
+    } catch (error) {
+        res.status(400).json({ response: false, error: error.message });
+    } finally {
+        client.release(true);
+    }
+
+}
+
+// ============== List Analysts by Email ===============
+
+const searchUserByEmail = async (req, res) => {
+    const client = await pool.connect();
+    const user_email = req.params.email;
+    const values = [user_email];
+
+    try {
+        // Realizamos la consulta SQL con EXISTS
+        const query = `
+            SELECT EXISTS (
+                SELECT 1
+                FROM users
+                WHERE user_email = $1
+            ) AS email_exists;
+        `;
+
+        const response = await client.query(query, values);
+
+        // Verificamos el resultado y devolvemos true o false
+        const emailExists = response.rows[0].email_exists;
+        res.status(200).json({ response: true, email_exists: emailExists });
+    } catch (error) {
+        res.status(400).json({ response: false, error: error.message });
+    } finally {
+        client.release(true);
+    }
+};
+
 module.exports = {
     allDataUsers, allDataIncidence, dataFromUserEmail, createIncidence,
     createUser, searchUserEmail, deleteIncidenceId, createIncidenceDaily,
     allDataIncidenceDaily, searchIncidenceDailyEmail, searchAnalystsEmail,
-    deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId
+    deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId, UpdateImagesUserId, searchUserByEmail
 };

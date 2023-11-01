@@ -6,7 +6,7 @@ const middleware = require("../middleware/middleware")
 const {
 allDataUsers, allDataIncidence, dataFromUserEmail, createIncidence, createUser, searchUserEmail,
  deleteIncidenceId, createIncidenceDaily, allDataIncidenceDaily,
-  searchIncidenceDailyEmail, searchAnalystsEmail, deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId
+  searchIncidenceDailyEmail, searchAnalystsEmail, deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId, UpdateImagesUserId, searchUserByEmail
 
 } = require("../controllers/controllers")
  
@@ -14,9 +14,12 @@ allDataUsers, allDataIncidence, dataFromUserEmail, createIncidence, createUser, 
 //Routes USERS
 router.get("/users", allDataUsers);
 router.get("/users/:email",searchUserEmail);
+router.get("/users/exist/:email",searchUserByEmail);
 router.post("/users" , createUser);
 router.delete('/users/delete/:id', deleteUserId);
 router.patch('/users/update/:id', updateUserId);
+router.patch('/users/updateImages/:id', UpdateImagesUserId);
+
 
 
 

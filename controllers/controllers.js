@@ -3,14 +3,11 @@
 // importacion de querys
 const { listUsers, listIncidence, getIncidenceByUserEmail, queryCreateIncidence, queryCreateUser,
     updateIncidencia, getAllUsersByEmail, queryDeleteIncidenceId, queryCreateIncidenceDaily, listIncidenceDaily, getAllIncidenceDailyByEmail
-    , getAnalystsByEmail, queryDeleteUserId, queryDeleteDailyId, queryUpdateUserId, querySearchIncidenciasUserId, querySearchDailyUserId, queryUpdateImagesUserId } = require("../query");
+    , getAnalystsByEmail, queryDeleteUserId, queryDeleteDailyId, queryUpdateUserId, querySearchIncidenciasUserId, querySearchDailyUserId, queryUpdateImagesUserId, querySearchOtByState } = require("../query");
 
 
 
-const Pool = require("pg").Pool;
-const pool = new Pool({
-    connectionString: process.env.POSTGRES_URL
-})
+const pool = require("../db");
 
 // ============== List all the Users ===============
 const allDataUsers = async (req, res) => {
@@ -69,7 +66,10 @@ const dataFromUserEmail = async (req, res) => {
 
 const createIncidence = async (req, res) => {
     const client = await pool.connect();
-    const { user_id, fault_location, failure, priority_level, user_email, name, description, time_start } = req.body;
+    const { user_id, fault_location, failure, priority_level, user_email, name, state, description, time_start } = req.body;
+
+    console.log('Cuerpo de la solicitud recibida:', req.body);
+
     const values = [
         user_id,
         fault_location,
@@ -77,6 +77,7 @@ const createIncidence = async (req, res) => {
         priority_level,
         user_email,
         name,
+        state,
         description,
         time_start
     ];
@@ -84,11 +85,11 @@ const createIncidence = async (req, res) => {
 
     try {
         const response = await client.query(queryCreateIncidence, values);
+        console.log('Respuesta del servidor:', response.rows);
         res.status(200).json({ response: true, result: response.rows });
     } catch (error) {
+        console.error('Error en el servidor:', error);
         res.status(400).json({ response: false, error: error.message });
-    } finally {
-        client.release(true);
     }
 }
 
@@ -289,7 +290,7 @@ const searchIncidenciasUserId = async (req, res) => {
     const client = await pool.connect();
     const user_id = req.params.id;
     const values = [user_id];
-    
+
     try {
         const response = await client.query(querySearchIncidenciasUserId, values);
         res.status(200).json({ response: true, result: response.rows });
@@ -298,16 +299,16 @@ const searchIncidenciasUserId = async (req, res) => {
     } finally {
         client.release(true);
     }
-    
-    }
 
-    // ============ Search a DAILY for User ID ================
+}
+
+// ============ Search a DAILY for User ID ================
 
 const searchDailyUserId = async (req, res) => {
     const client = await pool.connect();
     const user_id = req.params.id;
     const values = [user_id];
-    
+
     try {
         const response = await client.query(querySearchDailyUserId, values);
         res.status(200).json({ response: true, result: response.rows });
@@ -316,10 +317,10 @@ const searchDailyUserId = async (req, res) => {
     } finally {
         client.release(true);
     }
-    
-    }
 
-    
+}
+
+
 // ============ UPDATE IMAGES USER for ID================
 
 const UpdateImagesUserId = async (req, res) => {
@@ -368,9 +369,31 @@ const searchUserByEmail = async (req, res) => {
     }
 };
 
+
+// ======== List INCIDENCE by ESTATE ==================
+
+const searchIncidenceByState = async (req, res) => {
+    const client = await pool.connect();
+    const state = req.params.state;
+    const values = [state];
+
+    try {
+        const response = await client.query(querySearchOtByState, values);
+        res.status(200).json({ response: true, result: response.rows });
+    } catch (error) {
+        res.status(400).json({ response: false, error: error.message });
+    } finally {
+        client.release(true);
+    }
+
+}
+
+
+
 module.exports = {
     allDataUsers, allDataIncidence, dataFromUserEmail, createIncidence,
     createUser, searchUserEmail, deleteIncidenceId, createIncidenceDaily,
     allDataIncidenceDaily, searchIncidenceDailyEmail, searchAnalystsEmail,
     deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId, UpdateImagesUserId, searchUserByEmail
+    , searchIncidenceByState
 };

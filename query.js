@@ -12,12 +12,14 @@ const getSearchUserByEmail = `SELECT EXISTS (SELECT 1 FROM users WHERE user_emai
 const querySearchIncidenciasUserId = `SELECT * FROM incidencias WHERE user_id = $1`;
 const querySearchDailyUserId = `SELECT * FROM daily WHERE user_id = $1`;
 
+const querySearchOtByState = `SELECT * FROM incidencias WHERE state = $1`;
+
 
 
 
 //  ==================== POST =======================
 
-const queryCreateIncidence = `INSERT INTO incidencias (user_id, fault_location, failure, priority_level, user_email, name , description ,time_start) VALUES ($1, $2, $3, $4, $5, $6, $7, TO_TIMESTAMP($8, 'YYYY-MM-DD HH24:MI')) RETURNING *`;
+const queryCreateIncidence = `INSERT INTO incidencias (user_id, fault_location, failure, priority_level, user_email, name , state, description , time_start) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TO_TIMESTAMP($9, 'YYYY-MM-DD HH24:MI')) RETURNING *`;
 
 const queryCreateIncidenceDaily = `INSERT INTO daily (user_id, failure_daily , location_daily , description_daily, downtime, name, user_email, time_start) VALUES ($1, $2, $3, $4, $5, $6, $7, TO_TIMESTAMP($8, 'YYYY-MM-DD HH24:MI')) RETURNING *`;
 
@@ -37,7 +39,8 @@ const queryDeleteDailyId = `DELETE FROM daily WHERE user_id = $1 RETURNING *`;
 
 module.exports = {
     listUsers, listIncidence, queryUpdateUserId, getIncidenceByUserEmail, queryCreateIncidence, queryCreateUser, updateIncidencia, getAllUsersByEmail,
-    queryDeleteIncidenceId, queryCreateIncidenceDaily, 
+    queryDeleteIncidenceId, queryCreateIncidenceDaily,
     listIncidenceDaily, getAllIncidenceDailyByEmail, getAnalystsByEmail,
-    querySearchDailyUserId, queryDeleteUserId, queryDeleteDailyId, querySearchIncidenciasUserId, queryUpdateImagesUserId, getSearchUserByEmail
+    querySearchDailyUserId, queryDeleteUserId, queryDeleteDailyId, querySearchIncidenciasUserId, queryUpdateImagesUserId, getSearchUserByEmail,
+    querySearchOtByState
 };

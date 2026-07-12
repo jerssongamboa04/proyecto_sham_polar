@@ -6,7 +6,8 @@ const middleware = require("../middleware/middleware")
 const {
 allDataUsers, allDataIncidence, dataFromUserEmail, createIncidence, createUser, searchUserEmail,
  deleteIncidenceId, createIncidenceDaily, allDataIncidenceDaily,
-  searchIncidenceDailyEmail, searchAnalystsEmail, deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId, searchDailyUserId, UpdateImagesUserId, searchUserByEmail
+  searchIncidenceDailyEmail, searchAnalystsEmail, deleteUserId, deleteDailyId, updateUserId, searchIncidenciasUserId,
+   searchDailyUserId, UpdateImagesUserId, searchUserByEmail, searchIncidenceByState
 
 } = require("../controllers/controllers")
  
@@ -25,6 +26,7 @@ router.patch('/users/updateImages/:id', UpdateImagesUserId);
 
 //Routes INCIDENCE
 router.get('/incidence/user/:id', searchIncidenciasUserId);
+router.get("/incidence/state/:state" , searchIncidenceByState);
 router.get("/incidence" , allDataIncidence);
 router.get("/incidence/:email", dataFromUserEmail);
 router.post("/incidence/", createIncidence);

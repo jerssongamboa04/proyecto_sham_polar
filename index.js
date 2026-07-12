@@ -15,7 +15,13 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
-
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: "sham-app-api",
+    database: "supabase",
+  });
+});
 app.use("/", router);
 
 app.listen(PORT, () => {

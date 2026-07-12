@@ -1,15 +1,20 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
-if (!process.env.POSTGRES_URL) {
-  throw new Error("POSTGRES_URL no está definida en el archivo .env");
+const connectionString = process.env.POSTGRES_URL;
+
+if (!connectionString) {
+  console.error("POSTGRES_URL no está definida");
 }
 
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
+  connectionString,
   ssl: {
     rejectUnauthorized: false,
   },
+  max: 1,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,
 });
 
 module.exports = pool;
